@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "bikeapp",
+    "slug": "bikeapp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "bikeapp"
+}
