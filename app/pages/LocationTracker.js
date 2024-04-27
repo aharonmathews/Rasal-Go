@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
 import haversine from 'haversine';
 import * as Location from 'expo-location';
@@ -72,8 +72,12 @@ const LocationTracker = () => {
         </>
       )}
       <View style={styles.buttonContainer}>
-        <Button onPress={startTracking} title="Start Tracking" />
-        <Button onPress={stopTracking} title="End Tracking" />
+        <TouchableOpacity onPress={startTracking} style={styles.button}>
+          <Text style={styles.buttonText}>Start Tracking</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={stopTracking} style={styles.button}>
+          <Text style={styles.buttonText}>End Tracking</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -108,6 +112,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     paddingBottom: 10,
+  },
+  button: {
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   error: {
     textAlign: 'center',

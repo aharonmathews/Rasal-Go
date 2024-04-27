@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../config/firebase';
 
@@ -61,7 +61,9 @@ const DatabaseTable = () => {
         {data.map((item) => renderItem({ item }))}
       </ScrollView>
 
-      <Button title="Add Row" onPress={() => setShowModal(true)} />
+      <TouchableOpacity style={styles.button} onPress={() => setShowModal(true)}>
+        <Text style={styles.buttonText}>Add an entry</Text>
+      </TouchableOpacity>
 
       <Modal visible={showModal} animationType="slide">
         <View style={styles.modalContainer}>
@@ -90,8 +92,12 @@ const DatabaseTable = () => {
             value={newData.startDistance}
           />
           <View style={styles.horizontalContainer}>
-            <Button title="Add Row" onPress={addRow} color="#000" />
-            <Button title="Cancel" onPress={() => setShowModal(false)} color="#000" />
+            <TouchableOpacity style={styles.smallButton} onPress={addRow}>
+              <Text style={styles.buttonText}>Add Row</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.smallButton} onPress={() => setShowModal(false)}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -117,11 +123,15 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     textAlign: 'center',
+    color: '#000', // Text color
+    fontSize: 16, // Font size
   },
   headerCell: {
     flex: 1,
     textAlign: 'center',
     fontWeight: 'bold',
+    color: '#000', // Text color
+    fontSize: 16, // Font size
   },
   modalContainer: {
     flex: 1,
@@ -136,11 +146,38 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     width: '100%',
+    backgroundColor: '#fff', // Background color
+    borderRadius: 10, // Border radius
+    fontSize: 16, // Font size
   },
   horizontalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#000',
+    padding: 10,
+    borderRadius: 15,
+    marginVertical: 10,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  smallButton: {
+    backgroundColor: '#000',
+    padding: 10,
+    borderRadius: 15,
+    marginVertical: 10,
+    width: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,6 +8,7 @@ import LoginScreen from './app/pages/LoginScreen';
 import DatabaseTable from './app/pages/DatabaseTable';
 import CreateAccount from './app/pages/CreateAccount';
 import LocationTracker from './app/pages/LocationTracker';
+import ChoiceScreen from './app/pages/ChoiceScreen'; // Import the new ChoiceScreen component
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ const App = () => {
       ) : (
         <Stack.Navigator initialRouteName="LoginScreen">
           <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="ChoiceScreen" component={ChoiceScreen} options={{ headerShown: false }} />
           <Stack.Screen name="DatabaseTable" component={DatabaseTable} options={{ headerShown: false }} />
           <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ headerShown: false }} />
           <Stack.Screen name="LocationTracker" component={LocationTracker} options={{ headerShown: false }} />
