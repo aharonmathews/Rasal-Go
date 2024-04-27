@@ -32,11 +32,11 @@ const CreateAccount = ({ navigation }) => {
     }
   }
 
-  
+
   return (
     <View style={styles.container}>
       {/* Set background image for the entire container */}
-      <Image source={require('../../assets/wallpaper2.png')} style={styles.backgroundImage} />
+      <Image source={require('../../assets/images/wallpaper2.png')} style={styles.backgroundImage} />
 
       {/* Overlay content on top of the background image */}
       <View style={styles.contentOverlay}>

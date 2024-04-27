@@ -1,7 +1,4 @@
 {
-  "compilerOptions": {
-    // ... other options
-    "types": ["node"]
-  },
+  "compilerOptions": {},
   "extends": "expo/tsconfig.base"
 }

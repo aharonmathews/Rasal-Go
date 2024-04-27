@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import {LinearGradient} from 'expo-linear-gradient'; // Import for Gradient
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient'; 
+import LottieView from 'lottie-react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../../config/firebase';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the eye icons
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
+  const lottieRef = useRef(null);
 
   const signIn = async () => {
     setLoading(true);
@@ -22,46 +26,84 @@ const LoginScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const signUp = async () => {
     navigation.navigate('CreateAccount');
-  }
+  };
+
+  useEffect(() => {
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  }, [lottieRef]);
+
+  const handleAnimationClick = () => {
+    if (lottieRef.current) {
+      lottieRef.current.reset();
+      lottieRef.current.play();
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
-      <Image source={require('../../assets/wallpaper2.png')} style={styles.backgroundImage} />
-
-      
-      <View style={styles.contentOverlay}>
-        <View style={styles.centeredContent}>
-          <Text style={styles.title}>Welcome!</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.fieldLabel}>Username:</Text>
-            <TextInput
-              placeholder="Enter username"
-              value={email}
-              style={styles.textInput}
-              autoCapitalize='none'
-              onChangeText={(text) => setEmail(text)}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.fieldLabel}>Password:</Text>
-            <TextInput
-              placeholder="Enter password"
-              onChangeText={(text) => setPassword(text)}
-              value={password}
-              secureTextEntry={true}
-              style={styles.textInput}
-            />
-          </View>
-          <Button title='Login' onPress={signIn} style={styles.primaryButton} color="transparent" ></Button>
-          <Button title='Create Account' onPress={signUp}  color="transparent" autoCapitalize='false' ></Button>
+  <LottieView
+    ref={lottieRef}
+    source={require('../../assets/animation/loginAnimation.json')}
+    style={styles.lottieAnimation}
+    loop={false}
+    autoPlay={false}
+    resizeMode="cover"
+    clickable={true}
+    onPress={handleAnimationClick}
+  />
+  <View style={styles.contentOverlay}>
+    <View style={styles.centeredContent}>
+      <Text style={styles.title}>Welcome!</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.fieldLabel}>Username:</Text>
+        <TextInput
+          placeholder="Enter username"
+          value={email}
+          style={styles.textInput}
+          autoCapitalize="none"
+          onChangeText={(text) => setEmail(text)}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.fieldLabel}>Password:</Text>
+        <TextInput
+          placeholder="Enter password"
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          secureTextEntry={!showPassword}
+          style={styles.textInput}
+        />
+        {/* Toggle button for password visibility */}
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.toggleButton}>
+          {showPassword ? <Ionicons name="eye-off" size={24} color="black" /> : <Ionicons name="eye" size={24} color="black" />}
+        </TouchableOpacity>
+      </View>
+      <View style={styles.primaryContainer}>
+        <Button title="Login" onPress={signIn} color="transparent" ></Button>
+      </View>
+      <View style={styles.horizontalContainer}>
+        <Text style={styles.dontHaveAccountText}>
+          Don't have an account?
+        </Text>
+        <View style={styles.secondaryContainer}>
+          <Button
+            title="Create Account"
+            onPress={signUp}
+            color="transparent"
+            autoCapitalize="false"
+            titleStyle={styles.createAccountText}
+          />
         </View>
       </View>
     </View>
+  </View>
+</View>
   );
 };
 
@@ -69,18 +111,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover', // Stretch image to fill container
-    position: 'absolute', // Place image behind content
-    width: '100%', // Ensure image covers entire width
-    height: '100%', // Ensure image covers entire height
+  lottieAnimation: {
+    width: '100%',
+    height: '40%',
+    
   },
   contentOverlay: {
-    flex: 1, // Allow content to fill remaining space
-    justifyContent: 'center', // Center elements within the overlay
-    alignItems: 'center', // Center elements horizontally
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent black background
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
   },
   centeredContent: {
     alignItems: 'center',
@@ -88,7 +128,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    color: '#fff', // White text
+    color: '#000',
     fontWeight: 'bold',
     marginBottom: 20,
   },
@@ -97,20 +137,47 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 16,
-    color: '#fff', // White text
+    color: '#000',
     marginBottom: 5,
   },
   textInput: {
     padding: 10,
-    backgroundColor: '#fff', // White input background
+    backgroundColor: '#fff',
     borderRadius: 10,
     fontSize: 16,
-  },
-  primaryButton:{
+    width: 200,
     
-  }
+  },
+  primaryContainer: {
+    backgroundColor: '#000',
+    borderRadius: 30,
+    overflow: 'hidden', // Ensures child content respects the rounded corners
+    width: 200,
+    height:40,
+    margin:10,
+  },
+  secondaryContainer: {
+    backgroundColor:'#000',
+    borderRadius: 30,
+    overflow: 'hidden', // Ensures child content respects the rounded corners
+    height:36,
+    margin:10,
+  },
+  createAccountText: {
+    color: '#000', // Set text color to black
+  },
+  horizontalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10, // Adjust the spacing between text and button as needed
+  },
   
-  
+  toggleButton: {
+    position: 'absolute',
+    right: 10,
+    bottom:13,
+  },
 });
 
 export default LoginScreen;
