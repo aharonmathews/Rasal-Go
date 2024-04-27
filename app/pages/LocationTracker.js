@@ -1,100 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Modal } from 'react-native';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../config/firebase';
+import { View, Button, Text, StyleSheet } from 'react-native';
+import MapView, { Polyline, Marker } from 'react-native-maps';
+import haversine from 'haversine';
+import * as Location from 'expo-location';
 
 const LocationTracker = () => {
-  const [data, setData] = useState([]);
-  const [newData, setNewData] = useState({ coPassenger: '', endDistance: '', remark: '', startDistance: '' });
-  const [showModal, setShowModal] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(FIREBASE_DB, 'distance'));
-      const tempData = [];
-      querySnapshot.forEach((doc) => {
-        const { coPassenger, endDistance, remark, startDistance } = doc.data();
-        tempData.push({ id: doc.id, coPassenger, endDistance, remark, startDistance });
-      });
-      setData(tempData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      alert('Failed to fetch data!');
-    }
-  };
+  const [path, setPath] = useState([]);
+  const [distance, setDistance] = useState(0);
+  const [tracking, setTracking] = useState(false);
+  const [startLocation, setStartLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationError('Location permission is required for tracking.');
+        return;
+      }
+    })();
   }, []);
 
-  const addRow = async () => {
-    try {
-      await addDoc(collection(FIREBASE_DB, 'distance'), newData);
-      setNewData({ coPassenger: '', endDistance: '', remark: '', startDistance: '' });
-      // Call fetchData here to refresh data after adding a new row
-      fetchData();
-      setShowModal(false); // Hide modal after adding row
-    } catch (error) {
-      console.error('Error adding document:', error);
-      alert('Failed to add new row!');
+  const startTracking = () => {
+    if (!tracking && startLocation) {
+      setTracking(true);
+      setLocationError(null);
+    } else {
+      alert('Tracking', 'Tracking already in progress or no initial location.');
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.row}>
-      <Text style={styles.cell}>{item.coPassenger}</Text>
-      <Text style={styles.cell}>{item.endDistance}</Text>
-      <Text style={styles.cell}>{item.remark}</Text>
-      <Text style={styles.cell}>{item.startDistance}</Text>
-    </View>
-  );
+  const stopTracking = () => {
+    setTracking(false);
+  };
+
+  const calculateDistance = (newLocation) => {
+    if (startLocation) {
+      const newDistance = haversine(startLocation, newLocation);
+      setDistance((prevDistance) => prevDistance + newDistance);
+    }
+    setStartLocation(newLocation);
+  };
+
+  const onLocationChange = (location) => {
+    if (tracking) {
+      setPath((prevPath) => [...prevPath, location.coords]);
+      calculateDistance(location.coords);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.row}>
-          <Text style={styles.headerCell}>Co-passenger</Text>
-          <Text style={styles.headerCell}>End Distance</Text>
-          <Text style={styles.headerCell}>Remark</Text>
-          <Text style={styles.headerCell}>Start Distance</Text>
-        </View>
-        {data.map((item) => renderItem({ item }))}
-      </ScrollView>
-
-      <Button title="Add Row" onPress={() => setShowModal(true)} />
-
-      <Modal visible={showModal} animationType="slide">
-        <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Co-passenger"
-            onChangeText={(text) => setNewData({ ...newData, coPassenger: text })}
-            value={newData.coPassenger}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="End Distance"
-            onChangeText={(text) => setNewData({ ...newData, endDistance: text })}
-            value={newData.endDistance}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Remark"
-            onChangeText={(text) => setNewData({ ...newData, remark: text })}
-            value={newData.remark}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Start Distance"
-            onChangeText={(text) => setNewData({ ...newData, startDistance: text })}
-            value={newData.startDistance}
-          />
-          <View style={styles.horizontalContainer}>
-            <Button title="Add Row" onPress={addRow} color="#000" />
-            <Button title="Cancel" onPress={() => setShowModal(false)} color="#000" />
+      {locationError ? (
+        <Text style={styles.error}>{locationError}</Text>
+      ) : (
+        <>
+          <MapView
+            style={styles.map}
+            showsUserLocation
+            followsUserLocation
+            onUserLocationChange={onLocationChange}
+          >
+            <Polyline coordinates={path} strokeWidth={5} />
+            {path.length > 0 && <Marker coordinate={path[path.length - 1]} />}
+          </MapView>
+          <View style={styles.distanceContainer}>
+            <Text style={styles.distanceText}>
+              Distance Traveled: {distance.toFixed(2)} km
+            </Text>
           </View>
-        </View>
-      </Modal>
+        </>
+      )}
+      <View style={styles.buttonContainer}>
+        <Button onPress={startTracking} title="Start Tracking" />
+        <Button onPress={stopTracking} title="End Tracking" />
+      </View>
     </View>
   );
 };
@@ -102,45 +82,37 @@ const LocationTracker = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-  },
-  scrollView: {
-    marginBottom: 20,
-  },
-  row: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
+  },
+  map: {
+    flex: 1,
+    width: '100%',
+    height: '70%',
+  },
+  distanceContainer: {
     padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    shadowColor: 'black',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 5,
+    alignItems: 'center',
   },
-  cell: {
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerCell: {
-    flex: 1,
-    textAlign: 'center',
+  distanceText: {
+    fontSize: 18,
     fontWeight: 'bold',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  textInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    width: '100%',
-  },
-  horizontalContainer: {
+  buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    paddingBottom: 10,
+  },
+  error: {
+    textAlign: 'center',
+    marginTop: 10,
+    color: 'red',
   },
 });
 

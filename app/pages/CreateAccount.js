@@ -4,7 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient'; // Import for Gradient
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../../config/firebase'
 
-import LocationTracker from './LocationTracker';
+
 
 const CreateAccount = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -32,6 +32,7 @@ const CreateAccount = ({ navigation }) => {
     }
   }
 
+  
   return (
     <View style={styles.container}>
       {/* Set background image for the entire container */}
