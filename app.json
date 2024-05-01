@@ -5,7 +5,12 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c1047fc6-43cb-46a5-adb8-768eea0bf29a"
+      }
+    }
   },
   "name": "bikeapp"
 }

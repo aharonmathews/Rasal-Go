@@ -32,6 +32,13 @@ const LoginScreen = ({ navigation }) => {
     navigation.navigate('CreateAccount');
   };
 
+  const onPressAnimation = () =>{
+    if(lottieRef.current){
+      lottieRef.current.reset();
+      lottieRef.current.play();
+    }
+  };
+
   useEffect(() => {
     if (lottieRef.current) {
       lottieRef.current.play();
@@ -44,69 +51,65 @@ const LoginScreen = ({ navigation }) => {
       lottieRef.current.play();
     }
   };
-
   return (
     <View style={styles.container}>
-  <LottieView
-    ref={lottieRef}
-    source={require('../../assets/animation/loginAnimation.json')}
-    style={styles.lottieAnimation}
-    loop={false}
-    autoPlay={false}
-    resizeMode="cover"
-    clickable={true}
-    onPress={handleAnimationClick}
-  />
-  <View style={styles.contentOverlay}>
-    <View style={styles.centeredContent}>
-      <Text style={styles.title}>Welcome!</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.fieldLabel}>Username:</Text>
-        <TextInput
-          placeholder="Enter username"
-          value={email}
-          style={styles.textInput}
-          autoCapitalize="none"
-          onChangeText={(text) => setEmail(text)}
+          <LottieView
+          ref={lottieRef}
+          source={require('../../assets/animation/loginAnimation.json')}
+          style={styles.lottieAnimation}
+          loop={false} 
+          autoPlay={false} 
+          resizeMode="cover"
+          onPress={onPressAnimation}
         />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.fieldLabel}>Password:</Text>
-        <TextInput
-          placeholder="Enter password"
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={!showPassword}
-          style={styles.textInput}
-        />
-        {/* Toggle button for password visibility */}
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.toggleButton}>
-          {showPassword ? <Ionicons name="eye-off" size={24} color="black" /> : <Ionicons name="eye" size={24} color="black" />}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.primaryContainer}>
-        <Button title="Login" onPress={signIn} color="transparent" ></Button>
-      </View>
-      <View style={styles.horizontalContainer}>
-        <Text style={styles.dontHaveAccountText}>
-          Don't have an account?
-        </Text>
-        <View style={styles.secondaryContainer}>
-          <Button
-            title="Create Account"
-            onPress={signUp}
-            color="transparent"
-            autoCapitalize="false"
-            titleStyle={styles.createAccountText}
-          />
+        <View style={styles.contentOverlay}>
+          <View style={styles.centeredContent}>
+            <Text style={styles.title}>Welcome!</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.fieldLabel}>Username:</Text>
+              <TextInput
+                placeholder="Enter username"
+                value={email}
+                style={styles.textInput}
+                autoCapitalize="none"
+                onChangeText={(text) => setEmail(text)}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.fieldLabel}>Password:</Text>
+              <TextInput
+                placeholder="Enter password"
+                onChangeText={(text) => setPassword(text)}
+                value={password}
+                secureTextEntry={!showPassword}
+                style={styles.textInput}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.toggleButton}>
+                {showPassword ? <Ionicons name="eye-off" size={24} color="black" /> : <Ionicons name="eye" size={24} color="black" />}
+              </TouchableOpacity>
+            </View>
+            <View style={styles.primaryContainer}>
+              <Button title="Login" onPress={signIn} color="transparent" ></Button>
+            </View>
+            <View style={styles.horizontalContainer}>
+              <Text style={styles.dontHaveAccountText}>
+                Don't have an account?
+              </Text>
+              <View style={styles.secondaryContainer}>
+                <Button
+                  title="Create Account"
+                  onPress={signUp}
+                  color="transparent"
+                  autoCapitalize="false"
+                  titleStyle={styles.createAccountText}
+                />
+              </View>
+            </View>
+          </View>
         </View>
       </View>
-    </View>
-  </View>
-</View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -114,7 +117,6 @@ const styles = StyleSheet.create({
   lottieAnimation: {
     width: '100%',
     height: '40%',
-    
   },
   contentOverlay: {
     flex: 1,
@@ -139,6 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     marginBottom: 5,
+    fontWeight:'bold'
   },
   textInput: {
     padding: 10,
@@ -146,12 +149,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 16,
     width: 200,
-    
   },
   primaryContainer: {
     backgroundColor: '#000',
     borderRadius: 30,
-    overflow: 'hidden', // Ensures child content respects the rounded corners
+    overflow: 'hidden',
     width: 200,
     height:40,
     margin:10,
@@ -159,20 +161,19 @@ const styles = StyleSheet.create({
   secondaryContainer: {
     backgroundColor:'#000',
     borderRadius: 30,
-    overflow: 'hidden', // Ensures child content respects the rounded corners
+    overflow: 'hidden',
     height:36,
     margin:10,
   },
   createAccountText: {
-    color: '#000', // Set text color to black
+    color: '#000',
   },
   horizontalContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10, // Adjust the spacing between text and button as needed
+    marginTop: 10, 
   },
-  
   toggleButton: {
     position: 'absolute',
     right: 10,
